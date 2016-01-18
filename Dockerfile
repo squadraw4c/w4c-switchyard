@@ -1,10 +1,10 @@
 # -----Add instalation wildfly 8.1.0.Final com java 8
 # MAINTAINER Cesar Augusto <cesar.augusto@squadra.com.br>
 
-FROM jboss/base-jdk:8
+FROM jboss/base-jdk:8  
 
 # Set the WILDFLY_VERSION env variable
-ENV WILDFLY_VERSION 8.1.0.Final
+ENV WILDFLY_VERSION 8.0.0.Final
 
 # Add the WildFly distribution to /opt, and make wildfly the owner of the extracted tar content
 # Make sure the distribution is available from a well-known place
@@ -33,7 +33,6 @@ RUN cd $JBOSS_HOME && curl http://downloads.jboss.org/switchyard/releases/$JBOSS
 
 
 # ------Add user for wildfly user:admin password:r547achzqX96XQUJ
-# YOU MUST ALTER ON THE FIRST TIME LOGIN
 
 RUN /opt/jboss/wildfly/bin/add-user.sh admin r547achzqX96XQUJ --silent
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
@@ -42,18 +41,18 @@ CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0
 ENV ANT_VERSION 1.9.6
 
 RUN cd $HOME && curl -O http://www.us.apache.org/dist//ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
-    tar -xzf apache-ant-${ANT_VERSION}-bin.tar.gz
+    tar -xzf apache-ant-${ANT_VERSION}-bin.tar.gz 
 
 ENV ANT_HOME $HOME/apache-ant-${ANT_VERSION}
 ENV PATH ${PATH}: $HOME/apache-ant-${ANT_VERSION}/bin
 
-# Install Picketlink
+# Install Picketlinkl
 
 #- name: Download picketlink-installer-2.7.0.Final.zip
-RUN cd $HOME && curl -O http://downloads.jboss.org/picketlink/2/2.7.1.Final/picketlink-installer-2.7.1.Final.zip
+RUN cd $HOME && curl -O http://downloads.jboss.org/picketlink/2/2.7.1.Final/picketlink-installer-2.7.1.Final.zip 
 
 #- name: Unarchive picketlink-installer-2.7.0.Final.zip
-RUN jar xvf $HOME/picketlink-installer-2.7.1.Final.zip
+RUN jar xvf $HOME/picketlink-installer-2.7.1.Final.zip 
 
 #- name: Start picketlink for wildfly
 
@@ -64,5 +63,10 @@ RUN cd $HOME/picketlink-installer-2.7.1.Final/ && \
 
 RUN cd $HOME && curl -O  http://nexus.service.consul:8081/nexus/service/local/repositories/releases/content/org/wildfly/connector/rabbitmq-rar/0.0.1/rabbitmq-rar-0.0.1.rar && mv $HOME/rabbitmq-rar-0.0.1.rar $HOME/wildfly/standalone/deployments
 
+#- Add arquivos configuration picketlink
 
+RUN cd $HOME/wildfly/modules/system/layers/base/org/picketlink/federation/ && mkdir -p bindings-jbas7/main
 
+ADD picketlink-jbas7-2.7.0.Final.jar wildfly/modules/system/layers/base/org/picketlink/federation/bindings-jbas7/main/picketlink-jbas7-2.7.0.Final.jar
+ADD picketlink-wildfly8-2.7.0.Final.jar wildfly/modules/system/layers/base/org/picketlink/federation/bindings-jbas7/main/picketlink-wildfly8-2.7.0.Final.jar			  	
+ADD module.xml wildfly/modules/system/layers/base/org/picketlink/federation/bindings-jbas7/main/module.xml
